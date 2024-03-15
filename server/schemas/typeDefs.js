@@ -7,6 +7,21 @@ const typeDefs = `
     password: String
     confirmPassword: String
     avatarPic: String
+    friends: [User]
+    conversations: [Conversation]
+    messages: [Message]
+  }
+
+  type Conversation {
+    participants: [User]
+    messages: [Message]
+  }
+
+  type Message {
+    _id: ID
+    senderId: ID
+    receiverId: ID
+    messageContent: String
   }
 
   type Auth {
@@ -15,7 +30,12 @@ const typeDefs = `
   }
 
   type Query {
-    user(username: String!): User 
+    user(username: String!): User
+    users: [User]
+    conversation(_id: ID!): Conversation
+    conversations(username: String): [Conversation]
+    message(_id: ID!): Message
+    messages(username: String): [Message] 
   }
 
   type Mutation {
@@ -28,12 +48,16 @@ const typeDefs = `
       avatarPic: String
     ): Auth
     updateUser(
-      firstName: String
-      lastName: String
-      email: String
+      username: String
       password: String
+      confirmPassword: String
     ): User
     login(email: String!, password: String!): Auth
+    sendMessage(
+      senderId: ID!
+      receiverId: ID!
+      messageContent: String!
+    ): Message
   }
 `;
 

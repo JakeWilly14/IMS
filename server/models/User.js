@@ -30,7 +30,30 @@ const userSchema = new Schema({
   avatarPic: {
     type: String,
     default: '',
-  } 
+  },
+  friends: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    }
+  ],
+  conversations: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Conversation",
+    }
+  ],
+  messages: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Message",
+    }
+  ]
+}, { timestamps: true }
+);
+
+userSchema.virtual('friendCount').get(function () {
+  return this.friends.length;
 });
 
 // Set up pre-save middleware to create password
