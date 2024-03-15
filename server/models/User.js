@@ -23,6 +23,10 @@ const userSchema = new Schema({
     required: true,
     minlength: 6,
   },
+  confirmPassword:{
+    type: String,
+    required: true,
+  },
   avatarPic: {
     type: String,
     default: '',
@@ -41,7 +45,7 @@ userSchema.pre('save', async function (next) {
 
 // Compare the incoming password with the hashed password
 userSchema.methods.isCorrectPassword = async function (password) {
-  await bcrypt.compare(password, this.password);
+  return await bcrypt.compare(password, this.password);
 };
 
 const User = mongoose.model('User', userSchema);

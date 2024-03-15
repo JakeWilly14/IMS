@@ -4,6 +4,8 @@ const typeDefs = `
     fullName: String
     username: String
     email: String
+    password: String
+    confirmPassword: String
     avatarPic: String
   }
 
@@ -13,7 +15,7 @@ const typeDefs = `
   }
 
   type Query {
-    user: User 
+    user(username: String!): User 
   }
 
   type Mutation {
@@ -22,6 +24,7 @@ const typeDefs = `
       username: String!
       email: String!
       password: String!
+      confirmPassword: String!
       avatarPic: String
     ): Auth
     updateUser(
