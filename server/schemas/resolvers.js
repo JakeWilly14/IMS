@@ -8,16 +8,27 @@ const resolvers = {
     user: async (parent, { username }) => {
       try {
         const user = await User.findOne({ username })
-        .populate('friends')
-        .populate('conversations')
-        .populate('messages');
+          .populate({
+            path: 'conversations',
+            populate: {
+              path: 'participants',
+              model: 'User'
+            }
+          })
+          .populate({
+            path: 'conversations',
+            populate: {
+              path: 'messages',
+              model: 'Message'
+            }
+          });
         
         if (!user) {
           return new Error('Could not find user by the username:', { username });
         }
-
+  
         return user;
-
+  
       } catch (error) {
         console.error("Error fetching user:", error);
         return null;
@@ -28,14 +39,22 @@ const resolvers = {
     },
     conversation: async (parent, { _id }) => {
       try {
-        const conversation = await Conversation.findOne({ _id }).populate('messages');
+        const conversation = await Conversation.findOne({ _id })
+          .populate({
+            path: 'participants',
+            model: 'User'
+          })
+          .populate({
+            path: 'messages',
+            model: 'Message'
+          });
         
         if (!conversation) {
           return new Error('Could not find conversation by the ID:', { _id });
         }
-
+    
         return conversation;
-
+    
       } catch (error) {
         console.error("Error fetching conversation:", error);
         return null;
@@ -82,7 +101,7 @@ const resolvers = {
     },
   },
   Mutation: {
-    addUser: async (parent, { fullName, username, email, password, confirmPassword }) => {
+    signup: async (parent, { fullName, username, email, password, confirmPassword }) => {
       if(password !== confirmPassword) {
         throw new Error('Passwords do not match. Try Again')
       }
@@ -139,6 +158,47 @@ const resolvers = {
         };
       }
     },
+    addFriend: async (_, { userId, friendId }) => {
+      try {
+        // Check if userId and friendId are valid ObjectId strings
+        if (!User.isValidObjectId(userId) || !User.isValidObjectId(friendId)) {
+          throw new Error("Invalid user or friend ID.");
+        }
+
+        // Check if userId and friendId are different
+        if (userId === friendId) {
+          throw new Error("You cannot add yourself as a friend.");
+        }
+
+        // Find the user and friend in the database
+        const user = await User.findById(userId);
+        const friend = await User.findById(friendId);
+
+        console.log();
+
+        if (!user || !friend) {
+          throw new Error("User or friend not found.");
+        }
+
+        // Check if friend is already in user's friends list
+        if (user.friends.includes(friendId)) {
+          throw new Error(`${friend.username} is already in the user's friends list.`);
+        }
+
+        // Add friend to user's friends list
+        user.friends.push(friendId);
+        await user.save();
+
+        // Add reciprocal friendship
+        friend.friends.push(userId);
+        await friend.save();
+
+        return { success: true, message: `${friend.username} added successfully.` };
+      } catch (error) {
+        console.error("Error adding friend:", error);
+        return { success: false, message: error.message };
+      }
+    },
     sendMessage: async (_, { senderId, receiverId, messageContent }) => {
       try {
         const newMessage = new Message({
@@ -168,6 +228,12 @@ const resolvers = {
 
         // Save the conversation
         await conversation.save();
+
+          // Update user documents with the conversation reference
+        await User.updateMany(
+          { _id: { $in: [senderId, receiverId] } },
+          { $addToSet: { conversations: conversation._id } }
+        );
 
         console.log("Message sent successfully.");
         return savedMessage;

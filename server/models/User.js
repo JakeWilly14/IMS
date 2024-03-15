@@ -43,18 +43,17 @@ const userSchema = new Schema({
       ref: "Conversation",
     }
   ],
-  messages: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Message",
-    }
-  ]
 }, { timestamps: true }
 );
 
 userSchema.virtual('friendCount').get(function () {
   return this.friends.length;
 });
+
+// Define a static method to validate ObjectId
+userSchema.statics.isValidObjectId = function(id) {
+  return mongoose.Types.ObjectId.isValid(id);
+};
 
 // Set up pre-save middleware to create password
 userSchema.pre('save', async function (next) {

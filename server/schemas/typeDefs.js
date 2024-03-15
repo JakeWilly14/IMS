@@ -9,7 +9,11 @@ const typeDefs = `
     avatarPic: String
     friends: [User]
     conversations: [Conversation]
-    messages: [Message]
+  }
+
+  type AddFriendResponse {
+    success: Boolean!
+    message: String
   }
 
   type Conversation {
@@ -32,14 +36,14 @@ const typeDefs = `
   type Query {
     user(username: String!): User
     users: [User]
-    conversation(_id: ID!): Conversation
+    conversation(conversationId: ID!): Conversation
     conversations(username: String): [Conversation]
-    message(_id: ID!): Message
+    message(messageId: ID!): Message
     messages(username: String): [Message] 
   }
 
   type Mutation {
-    addUser(
+    signup(
       fullName: String!
       username: String!
       email: String!
@@ -52,12 +56,19 @@ const typeDefs = `
       password: String
       confirmPassword: String
     ): User
-    login(email: String!, password: String!): Auth
+    login(
+      email: String!, 
+      password: String!
+      ): Auth
     sendMessage(
       senderId: ID!
       receiverId: ID!
       messageContent: String!
     ): Message
+    addFriend(
+      userId: ID!
+      friendId: ID!
+    ): AddFriendResponse
   }
 `;
 
