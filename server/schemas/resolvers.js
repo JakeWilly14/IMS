@@ -1,7 +1,9 @@
 const User = require('../models/User');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
-const { signToken, AuthenticationError } = require('../utils/auth');
+const { signToken } = require('../utils/auth');
+const { AuthenticationError } = require('apollo-server-errors');
+const bcrypt = require('bcrypt');
 
 const resolvers = {
   Query: {
@@ -36,6 +38,30 @@ const resolvers = {
     },
     users: async () => {
       return User.find();
+    },
+    me: async (parent, args, context) => {
+      // Ensure user is authenticated
+      if (!context.user) {
+        throw new AuthenticationError('You must be logged in to view this information.');
+      }
+
+      // Fetch and return the authenticated user
+      try {
+        const user = await User.findById(context.user._id)
+        .populate('friends')
+        .populate({
+          path: 'conversations',
+          populate: [
+            { path: 'participants' },
+            { path: 'messages' }
+          ]
+        });
+        
+        return user;
+      } catch (error) {
+        console.error('Error fetching authenticated user:', error);
+        throw new Error('Failed to fetch authenticated user.');
+      }
     },
     conversation: async (parent, { _id }) => {
       try {
@@ -111,15 +137,6 @@ const resolvers = {
 
       return { token, user };
     },
-    updateUser: async (parent, args, context) => {
-      if (context.user) {
-        return User.findByIdAndUpdate(context.user.id, args, {
-          new: true,
-        });
-      }
-
-      throw AuthenticationError;
-    },
     login: async (parent, { email, password }) => {
       try {
         const user = await User.findOne({ email });
@@ -158,6 +175,31 @@ const resolvers = {
         };
       }
     },
+    updateUser: async (_, { username, password }, context) => {
+      console.log("context", context.user);
+      try {
+        if (!context.user) {
+          throw new AuthenticationError('You must be logged in to update your profile.');
+        }
+  
+        const updatedFields = {};
+        if (username) {
+          updatedFields.username = username;
+        }
+        if (password) {
+          const hashedPassword = await bcrypt.hash(password, 10)
+
+          updatedFields.password = hashedPassword;
+        }
+        
+        const updatedUser = await User.findByIdAndUpdate(context.user._id, updatedFields, { new: true });
+       
+        return updatedUser;
+      } catch (error) {
+        console.error('Error updating user:', error);
+        throw new Error('Could not update user profile. Please try again later.');
+      }
+    },
     addFriend: async (_, { userId, friendId }) => {
       try {
         // Check if userId and friendId are valid ObjectId strings
@@ -173,8 +215,6 @@ const resolvers = {
         // Find the user and friend in the database
         const user = await User.findById(userId);
         const friend = await User.findById(friendId);
-
-        console.log();
 
         if (!user || !friend) {
           throw new Error("User or friend not found.");
@@ -196,6 +236,40 @@ const resolvers = {
         return { success: true, message: `${friend.username} added successfully.` };
       } catch (error) {
         console.error("Error adding friend:", error);
+        return { success: false, message: error.message };
+      }
+    },
+    removeFriend: async (_, { userId, friendId }) => {
+      try {
+        // Check if userId and friendId are valid ObjectId strings
+        if (!User.isValidObjectId(userId) || !User.isValidObjectId(friendId)) {
+          throw new Error("Invalid user or friend ID.");
+        }
+
+        // Check if userId and friendId are different
+        if (userId === friendId) {
+          throw new Error("You cannot remove yourself as a friend.");
+        }
+
+        // Find the user and friend in the database
+        const user = await User.findById(userId);
+        const friend = await User.findById(friendId);
+
+        if (!user || !friend) {
+          throw new Error("User or friend not found.");
+        }
+
+        // Remove friend from user's friends list
+        user.friends.pull(friendId);
+        await user.save();
+
+        // Remove user from friend's friends list
+        friend.friends.pull(userId);
+        await friend.save();
+
+        return { success: true, message: `${friend.username} removed successfully.` };
+      } catch (error) {
+        console.error("Error removing friend:", error);
         return { success: false, message: error.message };
       }
     },

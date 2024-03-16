@@ -11,7 +11,7 @@ const typeDefs = `
     conversations: [Conversation]
   }
 
-  type AddFriendResponse {
+  type UpdatedFriends {
     success: Boolean!
     message: String
   }
@@ -36,6 +36,7 @@ const typeDefs = `
   type Query {
     user(username: String!): User
     users: [User]
+    me: User
     conversation(conversationId: ID!): Conversation
     conversations(username: String): [Conversation]
     message(messageId: ID!): Message
@@ -51,15 +52,14 @@ const typeDefs = `
       confirmPassword: String!
       avatarPic: String
     ): Auth
-    updateUser(
-      username: String
-      password: String
-      confirmPassword: String
-    ): User
     login(
       email: String!, 
       password: String!
       ): Auth
+    updateUser(
+      username: String
+      password: String
+    ): User
     sendMessage(
       senderId: ID!
       receiverId: ID!
@@ -68,7 +68,11 @@ const typeDefs = `
     addFriend(
       userId: ID!
       friendId: ID!
-    ): AddFriendResponse
+    ): UpdatedFriends
+    removeFriend(
+      userId: ID!
+      friendId: ID!
+    ): UpdatedFriends
   }
 `;
 
