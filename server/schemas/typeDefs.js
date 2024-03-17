@@ -5,7 +5,6 @@ const typeDefs = `
     username: String
     email: String
     password: String
-    confirmPassword: String
     avatarPic: String
     friends: [User]
     conversations: [Conversation]
@@ -49,8 +48,6 @@ const typeDefs = `
       username: String!
       email: String!
       password: String!
-      confirmPassword: String!
-      avatarPic: String
     ): Auth
     login(
       email: String!, 

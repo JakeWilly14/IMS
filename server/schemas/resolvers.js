@@ -127,16 +127,23 @@ const resolvers = {
     },
   },
   Mutation: {
-    signup: async (parent, { fullName, username, email, password, confirmPassword }) => {
-      if(password !== confirmPassword) {
-        throw new Error('Passwords do not match. Try Again')
+    signup: async (parent, { fullName, username, email, password }) => {
+      console.log("signing up");
+      try {
+        const user = await User.create({ fullName, username, email, password });
+    
+        // Log success message
+        console.log('User created successfully:', user);
+    
+        const token = signToken(user);
+    
+        return { token, user };
+      } catch (error) {
+        // Log error message
+        console.error('Error creating user:', error);
+        throw new Error('Failed to create user');
       }
-      const user = await User.create({ fullName, username, email, password, confirmPassword });
-      
-      const token = signToken(user);
-
-      return { token, user };
-    },
+    },  
     login: async (parent, { email, password }) => {
       try {
         const user = await User.findOne({ email });
