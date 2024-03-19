@@ -37,6 +37,20 @@ h1 {
   line-height: 1.1;
 }
 
+.app-container {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.container, .card {
+  background-color: rgba(0, 0, 0, 0.6); /* Example background color */
+  backdrop-filter: blur(10px);
+  top: 10vw;
+  bottom: 20vw;
+  left: 5vw;
+  height: 70vh;
+}
+
 .sidebar-container {
   position: fixed;
   top: 10vw;
@@ -44,10 +58,7 @@ h1 {
   left: 5vw;
   height: 70vh;
   width: 22rem; /* Adjust width as needed */
-  background-color: rgba(0, 0, 0, 0.6); /* Example background color */
-  backdrop-filter: blur(10px);
   padding-top: 4rem; /* Adjust top padding to align with your header */
-  z-index: 100; /* Ensure sidebar appears above other content */
   border-radius: 8px;
 }
 
@@ -86,7 +97,7 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
+@media (max-width: 768px) {
   :root {
     color: #213547;
     background-color: #ffffff;

@@ -16,6 +16,7 @@ const typeDefs = `
   }
 
   type Conversation {
+    _id: ID!
     participants: [User]
     messages: [Message]
   }
@@ -36,6 +37,7 @@ const typeDefs = `
     user(username: String!): User
     users: [User]
     me: User
+    getUserFriends(userId: ID!): [User]!
     conversation(conversationId: ID!): Conversation
     conversations(username: String): [Conversation]
     message(messageId: ID!): Message
