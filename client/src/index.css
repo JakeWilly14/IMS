@@ -23,9 +23,11 @@ a:hover {
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
+  background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/IMS_bg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -34,6 +36,36 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
+
+.sidebar-container {
+  position: fixed;
+  top: 10vw;
+  bottom: 20vw;
+  left: 5vw;
+  height: 70vh;
+  width: 22rem; /* Adjust width as needed */
+  background-color: rgba(0, 0, 0, 0.6); /* Example background color */
+  backdrop-filter: blur(10px);
+  padding-top: 4rem; /* Adjust top padding to align with your header */
+  z-index: 100; /* Ensure sidebar appears above other content */
+  border-radius: 8px;
+}
+
+.sidebar-container .list-group-item {
+  background-color: transparent;
+}
+
+.sidebar-container .list-group-item a {
+  color: white;
+}
+
+.friends-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Adjust the gap between each list item */
+  margin-top: 20px; /* Adjust top margin as needed */
+}
+
 
 button {
   border-radius: 8px;

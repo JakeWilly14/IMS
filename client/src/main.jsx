@@ -7,6 +7,7 @@ import App from './App.jsx'
 import ErrorPage from '../src/pages/ErrorPage.jsx'
 import Login from './pages/Login.jsx';
 import SignUp from './pages/SignUp.jsx';
+import Home from './pages/Home.jsx';
 
 // Define the accessible routes, and which components respond to which URL
 const router = createBrowserRouter([
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       }, {
         path: '/signup',
         element: <SignUp />
+      },
+      {
+        path: '/home',
+        element: <Home />
       },
     ]
   }

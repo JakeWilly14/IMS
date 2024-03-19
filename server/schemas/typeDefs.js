@@ -43,7 +43,7 @@ const typeDefs = `
   }
 
   type Mutation {
-    signup(
+    signUp(
       fullName: String!
       username: String!
       email: String!
