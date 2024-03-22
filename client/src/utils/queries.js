@@ -40,6 +40,7 @@ export const GET_CONVERSATION_BY_PARTICIPANTS = gql`
         senderId
         receiverId
         messageContent
+        createdAt
       }
     }
   }

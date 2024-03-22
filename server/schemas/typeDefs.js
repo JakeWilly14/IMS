@@ -26,6 +26,7 @@ const typeDefs = `
     senderId: ID
     receiverId: ID
     messageContent: String
+    createdAt: String
   }
 
   type Auth {

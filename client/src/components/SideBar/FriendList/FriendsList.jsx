@@ -1,28 +1,15 @@
+import { MDBBtn, MDBListGroup, MDBListGroupItem, MDBIcon } from 'mdb-react-ui-kit';
 import { useQuery } from '@apollo/client';
-import { Link } from 'react-router-dom';
-
 import { GET_USER_FRIENDS } from '../../../utils/queries';
 import useUpdateFriend from '../../../utils/UpdateFriends';
 
-import { 
-  MDBBtn, 
-  MDBListGroup, 
-  MDBListGroupItem, 
-  MDBIcon
-} from 'mdb-react-ui-kit';
-
-export default function FriendsList({ searchResult, userId }) {
+const FriendsList = ({ searchResult, userId, handleFriendSelection }) => {
   const { loading, error, data, refetch } = useQuery(GET_USER_FRIENDS, {
     variables: { userId },
   });
-
   const { handleUpdateFriend, addFriendLoading, removeFriendLoading } = useUpdateFriend();
-  
-  let friendsToRender = data?.getUserFriends || [];
 
-  if (searchResult) {
-    friendsToRender = [searchResult];
-  }
+  const friendsToRender = searchResult ? [searchResult] : data?.getUserFriends || [];
 
   return (
     <MDBListGroup className='d-flex' light>
@@ -52,9 +39,9 @@ export default function FriendsList({ searchResult, userId }) {
                 </div>
               </div>
               <div className="d-flex">
-                <Link to={`/conversation/${friend._id}`}>
+                <MDBBtn onClick={() => handleFriendSelection(friend._id)}>
                   <MDBIcon className='ms-1' far icon="comments" size='2x'/>
-                </Link>
+                </MDBBtn>
                 <MDBBtn
                   size='sm'
                   rounded
@@ -72,3 +59,5 @@ export default function FriendsList({ searchResult, userId }) {
     </MDBListGroup>
   );
 }
+
+export default FriendsList;

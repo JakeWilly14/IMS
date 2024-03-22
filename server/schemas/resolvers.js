@@ -84,7 +84,8 @@ const resolvers = {
         })
         .populate({
           path: 'messages',
-          model: 'Message'
+          model: 'Message',
+          options: { sort: { createdAt: 1 } } // Ensure messages are sorted by createdAt
         });
     
         if (!conversation) {
@@ -96,7 +97,7 @@ const resolvers = {
         console.error("Error fetching conversation:", error);
         throw error;
       }
-    },
+    },    
     conversations: async (_, { username }) => {
       try {
         const params = username ? { username } : {};
@@ -296,9 +297,12 @@ const resolvers = {
         const newMessage = new Message({
           senderId,
           receiverId,
-          messageContent
+          messageContent,
+          createdAt: Date.now()
         });
 
+        
+    
         // Save the message
         const savedMessage = await newMessage.save();
         
@@ -306,7 +310,7 @@ const resolvers = {
         let conversation = await Conversation.findOne({
           participants: { $all: [senderId, receiverId] }
         });
-
+    
         // If conversation doesn't exist, create a new one
         if (!conversation) {
           conversation = new Conversation({
@@ -317,23 +321,25 @@ const resolvers = {
           // If conversation exists, add the message to it
           conversation.messages.push(savedMessage._id);
         }
-
+    
         // Save the conversation
         await conversation.save();
-
-          // Update user documents with the conversation reference
+    
+        // Update user documents with the conversation reference
         await User.updateMany(
           { _id: { $in: [senderId, receiverId] } },
           { $addToSet: { conversations: conversation._id } }
         );
-
+        console.log('before');
+        console.log(savedMessage);
+        console.log('after');
         console.log("Message sent successfully.");
         return savedMessage;
       } catch (error) {
         console.log("Error in sendMessage Mutation: ", error);
         return null;
       }
-    }
+    }    
   }
 }
 
