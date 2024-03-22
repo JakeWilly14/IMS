@@ -59,3 +59,43 @@ export const REMOVE_FRIEND = gql`
     }
   }
 `;
+
+export const CREATE_CONVERSATION = gql`
+  mutation CreateConversation(
+    $participant1Id: ID!, 
+    $participant2Id: ID!
+  ) {
+    createConversation(
+      participant1Id: $participant1Id, 
+      participant2Id: $participant2Id
+    ) {
+      _id
+      participants {
+        _id
+      }
+      messages {
+        _id
+      }
+    }
+  }
+`;
+
+export const SEND_MESSAGE = gql`
+  mutation SendMessage(
+    $senderId: ID!
+    $receiverId: ID!
+    $messageContent: String!
+  ) {
+    sendMessage(
+      senderId: $senderId
+      receiverId: $receiverId
+      messageContent: $messageContent
+    ) {
+      _id
+      senderId
+      receiverId
+      messageContent
+      createdAt
+    }
+  }
+`;

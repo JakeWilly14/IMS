@@ -74,6 +74,7 @@ const resolvers = {
       }
     },
     conversationByParticipants: async (_, { participant1Id, participant2Id }) => {
+      console.log("Fetching Conversation...");
       try {
         const conversation = await Conversation.findOne({ 
           participants: { $all: [participant1Id, participant2Id] }
@@ -290,6 +291,42 @@ const resolvers = {
       } catch (error) {
         console.error("Error removing friend:", error);
         return { success: false, message: error.message };
+      }
+    },
+    createConversation: async (_, { participant1Id, participant2Id }) => {
+      try {
+        // Check if participant IDs are valid ObjectId strings
+        if (!User.isValidObjectId(participant1Id) || !User.isValidObjectId(participant2Id)) {
+          throw new Error("Invalid participant IDs.");
+        }
+  
+        // Check if participant IDs are different
+        if (participant1Id === participant2Id) {
+          throw new Error("Cannot create conversation with yourself.");
+        }
+  
+        // Check if conversation already exists between participants
+        const existingConversation = await Conversation.findOne({
+          participants: { $all: [participant1Id, participant2Id] }
+        });
+  
+        if (existingConversation) {
+          throw new Error("Conversation already exists.");
+        }
+  
+        // Create a new conversation
+        const newConversation = new Conversation({
+          participants: [participant1Id, participant2Id],
+          messages: []
+        });
+  
+        // Save the new conversation
+        await newConversation.save();
+  
+        return newConversation;
+      } catch (error) {
+        console.error("Error creating conversation:", error);
+        throw new Error("Failed to create conversation.");
       }
     },
     sendMessage: async (_, { senderId, receiverId, messageContent }) => {

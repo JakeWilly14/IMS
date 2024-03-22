@@ -60,6 +60,10 @@ const typeDefs = `
       username: String
       password: String
     ): User
+    createConversation(
+      participant1Id: ID!
+      participant2Id: ID!
+    ): Conversation
     sendMessage(
       senderId: ID!
       receiverId: ID!
