@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import FriendsList from '../FriendList/FriendsList';
-import SearchBar from '../SearchBar/SearchBar'
-import { MDBContainer} from 'mdb-react-ui-kit';
 import AuthService from '../../utils/auth';
+
+import { MDBCard} from 'mdb-react-ui-kit';
+
+import FriendsList from './FriendList/FriendsList';
+import SearchBar from './SearchBar/SearchBar'
+import Logout from './Logout/Logout'
 
 export default function SideBar() {
   const [searchResult, setSearchResult] = useState(null);
@@ -12,11 +15,10 @@ export default function SideBar() {
   const userId = currentUser && currentUser.data ? currentUser.data._id : null;
 
   return (
-    <MDBContainer className='sidebar-container'>
+    <MDBCard style={{ width: "80vw", height: "75vh" }}>
       <SearchBar setSearchResult={setSearchResult}/>
-      <div className='friends-list-container'>
-        <FriendsList searchResult={searchResult} userId={userId}/>
-      </div>
-    </MDBContainer>
+      <FriendsList searchResult={searchResult} userId={userId}/>
+      <Logout />
+    </MDBCard>
   );
 }

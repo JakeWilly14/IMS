@@ -44,7 +44,7 @@ function Login() {
   };
 
   return (
-    <MDBContainer fluid>
+    <MDBContainer>
       <MDBRow className='d-flex justify-content-center align-items-center h-100'>
         <MDBCol col='12'>
           <MDBCard className='text-white my-5 mx-auto' style={{borderRadius: '1rem', maxWidth: '400px'}}>
@@ -66,7 +66,7 @@ function Login() {
                   wrapperClass='mb-4 mx-5 w-100' 
                   labelClass='text-white' 
                   label='Password' 
-                  id='email' 
+                  id='password' 
                   type='password' 
                   size="lg" 
                   name="password"

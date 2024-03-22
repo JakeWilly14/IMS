@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLazyQuery } from '@apollo/client';
-import { SEARCH_USER } from '../../utils/queries';
-import { MDBInput, MDBBtn } from 'mdb-react-ui-kit';
+import { SEARCH_USER } from '../../../utils/queries';
+import { MDBInput, MDBBtn, MDBCardHeader } from 'mdb-react-ui-kit';
 
 export default function SearchBar({ setSearchResult }) {
   const [formState, setFormState] = useState({ searchInput: '' });
@@ -38,21 +38,27 @@ export default function SearchBar({ setSearchResult }) {
   }, [formState.searchInput, setSearchResult]);
 
   return (
-    <form
-      className="text-white d-flex justify-content-center align-items-center p-3"
-      onSubmit={handleFormSubmit}
-    >
-      <MDBInput
-        id="searchInput"
-        name="searchInput"
-        type="text"
-        onChange={handleChange}
-      />
-      <MDBBtn className="m-auto" color="primary" size="md" rippleColor="dark" type="submit">
-        Search
-      </MDBBtn>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error.message}</p>}
-    </form>
+    <MDBCardHeader className="d-flex justify-content-between align-items-center p-3">
+      <h5 className="mb-0 text-white">Space Buddies:</h5>
+
+      <div className='d-flex justify-content-end'>
+        <form
+        className="d-flex p-3"
+        onSubmit={handleFormSubmit}
+        >
+        <MDBInput
+          id="searchInput"
+          name="searchInput"
+          type="text"
+          onChange={handleChange}
+        />
+        <MDBBtn className="m-auto ms-2" color="primary" size="md" rippleColor="dark" type="submit">
+          Search
+        </MDBBtn>
+        {loading && <p>Loading...</p>}
+        {error && <p>Error: {error.message}</p>}
+        </form>
+      </div>
+    </MDBCardHeader>
   );
 }

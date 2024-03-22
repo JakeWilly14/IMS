@@ -1,21 +1,21 @@
-import SideBar from '../components/SideBar/SideBar'
+import SideBar from "../components/SideBar/SideBar";
 import Conversation from '../components/Conversation/Conversations'
-import AuthService from '../utils/auth';
+import AuthService from "../utils/auth";
+import { MDBContainer } from "mdb-react-ui-kit";
 
 const Home = () => {
   const loggedIn = AuthService.loggedIn();
-  const profile = loggedIn ? AuthService.getProfile() : null;
 
   return (
-    <div className="app-container">
+    <MDBContainer
+      fluid
+      className="d-flex justify-content-center align-items-center"
+      style={{ height: "100vh" }}
+    >
       {loggedIn && <SideBar />}
-      {loggedIn ? (
-        <Conversation username={profile.username} />
-      ) : (
-        <div>Please log in to view this page</div>
-      )}
-    </div>
+      <Conversation />
+    </MDBContainer>
   );
-}
+};
 
-export default Home
+export default Home;

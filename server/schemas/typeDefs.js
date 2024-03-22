@@ -38,7 +38,7 @@ const typeDefs = `
     users: [User]
     me: User
     getUserFriends(userId: ID!): [User]!
-    conversation(conversationId: ID!): Conversation
+    conversationByParticipants(participant1Id: ID!, participant2Id: ID!): Conversation
     conversations(username: String): [Conversation]
     message(messageId: ID!): Message
     messages(username: String): [Message] 

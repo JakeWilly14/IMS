@@ -37,46 +37,10 @@ h1 {
   line-height: 1.1;
 }
 
-.app-container {
-  display: flex;
-  justify-content: space-evenly;
-}
-
-.container, .card {
+.card {
   background-color: rgba(0, 0, 0, 0.6); /* Example background color */
   backdrop-filter: blur(10px);
-  top: 10vw;
-  bottom: 20vw;
-  left: 5vw;
-  height: 70vh;
 }
-
-.sidebar-container {
-  position: fixed;
-  top: 10vw;
-  bottom: 20vw;
-  left: 5vw;
-  height: 70vh;
-  width: 22rem; /* Adjust width as needed */
-  padding-top: 4rem; /* Adjust top padding to align with your header */
-  border-radius: 8px;
-}
-
-.sidebar-container .list-group-item {
-  background-color: transparent;
-}
-
-.sidebar-container .list-group-item a {
-  color: white;
-}
-
-.friends-list-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px; /* Adjust the gap between each list item */
-  margin-top: 20px; /* Adjust top margin as needed */
-}
-
 
 button {
   border-radius: 8px;

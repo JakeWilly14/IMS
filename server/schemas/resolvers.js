@@ -8,7 +8,6 @@ const bcrypt = require('bcrypt');
 const resolvers = {
   Query: {
     user: async (parent, { username }) => {
-      console.log("querying user: ", username);
       try {
         const user = await User.findOne({ username })
           .populate({
@@ -65,7 +64,6 @@ const resolvers = {
       }
     },
     getUserFriends: async (parent, { userId }) => {
-      console.log("Getting user Friends");
       try {
         // Retrieve the user from the database
         const user = await User.findById(userId).populate('friends');
@@ -75,27 +73,28 @@ const resolvers = {
         throw new Error('Failed to fetch user friends');
       }
     },
-    conversation: async (parent, { _id }) => {
+    conversationByParticipants: async (_, { participant1Id, participant2Id }) => {
       try {
-        const conversation = await Conversation.findOne({ _id })
-          .populate({
-            path: 'participants',
-            model: 'User'
-          })
-          .populate({
-            path: 'messages',
-            model: 'Message'
-          });
-        
+        const conversation = await Conversation.findOne({ 
+          participants: { $all: [participant1Id, participant2Id] }
+        })
+        .populate({
+          path: 'participants',
+          model: 'User'
+        })
+        .populate({
+          path: 'messages',
+          model: 'Message'
+        });
+    
         if (!conversation) {
-          return new Error('Could not find conversation by the ID:', { _id });
+          throw new Error('Conversation not found');
         }
     
         return conversation;
-    
       } catch (error) {
         console.error("Error fetching conversation:", error);
-        return null;
+        throw error;
       }
     },
     conversations: async (_, { username }) => {

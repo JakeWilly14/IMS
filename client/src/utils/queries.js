@@ -24,9 +24,9 @@ export const GET_USER_FRIENDS = gql`
   }
 `;
 
-export const GET_CONVERSATION = gql`
-  query GetConversation($conversationId: ID!) {
-    conversation(conversationId: $conversationId) {
+export const GET_CONVERSATION_BY_PARTICIPANTS = gql`
+  query GetConversationByParticipants($participant1Id: ID!, $participant2Id: ID!) {
+    conversationByParticipants(participant1Id: $participant1Id, participant2Id: $participant2Id) {
       _id
       participants {
         _id
