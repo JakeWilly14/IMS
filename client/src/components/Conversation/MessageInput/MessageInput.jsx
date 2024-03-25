@@ -1,34 +1,23 @@
-import { useMutation } from '@apollo/client';
-import { SEND_MESSAGE } from '../../../utils/mutations';
-
+import { useState, useContext } from 'react';
+import { SocketContext } from '../../../utils/SocketContext';
 import {
   MDBCardFooter,
-  MDBIcon,
+  MDBIcon
 } from "mdb-react-ui-kit";
 
 export default function MessageInput({ senderId, receiverId }) {
-  const [sendMessage] = useMutation(SEND_MESSAGE);
-
-  const handleSendMessage = async (messageContent) => {
-    try {
-      await sendMessage({
-        variables: { senderId, receiverId, messageContent }
-      });
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  };
+  const { sendMessage } = useContext(SocketContext);
+  const [message, setMessage] = useState('');
 
   const handleSubmit = (event) => {
-    if (event) {
-      event.preventDefault();
+    event.preventDefault();
+    const messageInput = message.trim();
+    if (messageInput) {
+      sendMessage(senderId, receiverId, messageInput);
+      setMessage(''); // Clear input after sending message
+      console.log("handleMessageSubmit: ", messageInput);
     }
-    const messageInput = document.getElementById('exampleFormControlInput1').value;
-    if (messageInput.trim() !== '') {
-      handleSendMessage(messageInput);
-      document.getElementById('exampleFormControlInput1').value = ''; // Clear input after sending message
-    }
-  };;
+  };
 
   return (
     <div className='d-flex justify-content-center'>
@@ -42,8 +31,9 @@ export default function MessageInput({ senderId, receiverId }) {
           <input
             type="text"
             name="messageInput"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             className="form-control form-control-lg"
-            id="exampleFormControlInput1"
             placeholder="Type message"
           />
         </form>

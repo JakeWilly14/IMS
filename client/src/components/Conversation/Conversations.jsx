@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_CONVERSATION_BY_PARTICIPANTS } from '../../utils/queries';
-import { CREATE_CONVERSATION } from '../../utils/mutations';
+import { CREATE_CONVERSATION } from '../../utils/mutations'; // Import the subscription
 import AuthService from '../../utils/auth';
 import MessageInput from './MessageInput/MessageInput';
 import {
@@ -17,15 +17,16 @@ import {
 
 export default function Conversation({ friendId, handleBackToSidebar }) {
   const loggedInUserId = AuthService.getProfile().data._id;
+  const [messages, setMessages] = useState([]);
+
+  const { loading, error, data, refetch } = useQuery(GET_CONVERSATION_BY_PARTICIPANTS, {
+    variables: { participant1Id: loggedInUserId, participant2Id: friendId },
+  });
 
   const [createConversation] = useMutation(CREATE_CONVERSATION, {
     onError: (error) => {
       console.error("Error creating conversation:", error);
     }
-  });
-
-  const { loading, error, data, refetch } = useQuery(GET_CONVERSATION_BY_PARTICIPANTS, {
-    variables: { participant1Id: loggedInUserId, participant2Id: friendId },
   });
 
   useEffect(() => {
@@ -49,6 +50,14 @@ export default function Conversation({ friendId, handleBackToSidebar }) {
     }
   }, [createConversation, data?.conversationByParticipants, loggedInUserId, friendId, refetch]);
 
+  useEffect(() => {
+    // Update messages state when conversation data changes
+    if (data?.conversationByParticipants) {
+      setMessages(data.conversationByParticipants.messages);
+      console.log('Received messages:', data.conversationByParticipants.messages);
+    }
+  }, [data?.conversationByParticipants]);
+
   if (loading) return <p>Loading conversation...</p>;
   if (error) return <p>Error fetching conversation: {error.message}</p>;
 
@@ -57,7 +66,7 @@ export default function Conversation({ friendId, handleBackToSidebar }) {
 
   const senderId = loggedInUserId; // Sender ID is the logged-in user
   const receiverId = friendId; // Receiver ID is the friend
-  
+
   return (
     <MDBContainer fluid>
       <MDBRow className="d-flex justify-content-center">
@@ -71,7 +80,7 @@ export default function Conversation({ friendId, handleBackToSidebar }) {
             </MDBCardHeader>
             <div className="custom-scrollbar" style={{ maxHeight: "400px", overflow: "auto" }}>
               <MDBCardBody>
-                {conversation.messages.map(message => {
+                {messages.map(message => {
                   const isSender = message.senderId === loggedInUserId;
                   return (
                     <div key={message._id} className={`message-container ${isSender ? 'sender' : 'receiver'}`}>

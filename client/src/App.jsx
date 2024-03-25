@@ -6,6 +6,7 @@ import {
   createHttpLink,
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+import { SocketContextProvider } from './utils/SocketContext';
 
 const httpLink = createHttpLink({
   uri: '/graphql',
@@ -29,7 +30,9 @@ const client = new ApolloClient({
 function App() {
   return (
     <ApolloProvider client={client}>
+      <SocketContextProvider>
         <Outlet />
+      </SocketContextProvider>
     </ApolloProvider>
   );
 }

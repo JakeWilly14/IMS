@@ -4,6 +4,7 @@ const Message = require('../models/Message');
 const { signToken } = require('../utils/auth');
 const { AuthenticationError } = require('apollo-server-errors');
 const bcrypt = require('bcrypt');
+const io = require('../socket').io;
 
 const resolvers = {
   Query: {
@@ -338,10 +339,11 @@ const resolvers = {
           createdAt: Date.now()
         });
 
-        
-    
         // Save the message
         const savedMessage = await newMessage.save();
+
+        // Emit the message to the receiver
+        io.to(receiverId).emit('message', { senderId, messageContent });
         
         // Find the conversation between the sender and receiver
         let conversation = await Conversation.findOne({
@@ -367,9 +369,9 @@ const resolvers = {
           { _id: { $in: [senderId, receiverId] } },
           { $addToSet: { conversations: conversation._id } }
         );
-        console.log('before');
+      
         console.log(savedMessage);
-        console.log('after');
+     
         console.log("Message sent successfully.");
         return savedMessage;
       } catch (error) {
