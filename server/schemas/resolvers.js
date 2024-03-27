@@ -312,7 +312,8 @@ const resolvers = {
         });
   
         if (existingConversation) {
-          throw new Error("Conversation already exists.");
+          // Conversation already exists, return the existing conversation
+          return existingConversation;
         }
   
         // Create a new conversation

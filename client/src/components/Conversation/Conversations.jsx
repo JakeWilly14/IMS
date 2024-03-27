@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_CONVERSATION_BY_PARTICIPANTS } from '../../utils/queries';
-import { CREATE_CONVERSATION } from '../../utils/mutations'; // Import the subscription
+import { CREATE_CONVERSATION } from '../../utils/mutations';
 import AuthService from '../../utils/auth';
 import MessageInput from './MessageInput/MessageInput';
 import {
@@ -30,31 +30,43 @@ export default function Conversation({ friendId, handleBackToSidebar }) {
   });
 
   useEffect(() => {
+    let conversationCreationAttempted = false;
+  
     const handleCreateConversation = async () => {
       try {
         const result = await createConversation({
           variables: { participant1Id: loggedInUserId, participant2Id: friendId }
         });
+  
         if (result && result.data && result.data.createConversation) {
-          console.log('Created Conversation:', result.data.createConversation); // Log created conversation
+        
           await refetch(); // Refetch conversation data after creating conversation
         }
       } catch (error) {
-        console.error("Error creating conversation:", error);
+        // Check if the error indicates that the conversation already exists
+        if (
+          error.graphQLErrors &&
+          error.graphQLErrors.length > 0 &&
+          error.graphQLErrors[0].message === "Conversation already exists"
+        ) {
+          console.log('Conversation already exists');
+        } else {
+          console.error("Error creating conversation:", error);
+        }
+        conversationCreationAttempted = true;
       }
     };
-
-    // If conversation doesn't exist, create one
-    if (!data?.conversationByParticipants) {
+  
+    // If conversation doesn't exist and creation hasn't been attempted, create one
+    if (!data?.conversationByParticipants && !conversationCreationAttempted) {
       handleCreateConversation();
     }
   }, [createConversation, data?.conversationByParticipants, loggedInUserId, friendId, refetch]);
-
+  
   useEffect(() => {
     // Update messages state when conversation data changes
     if (data?.conversationByParticipants) {
       setMessages(data.conversationByParticipants.messages);
-      console.log('Received messages:', data.conversationByParticipants.messages);
     }
   }, [data?.conversationByParticipants]);
 
@@ -64,8 +76,8 @@ export default function Conversation({ friendId, handleBackToSidebar }) {
   const conversation = data?.conversationByParticipants;
   const friend = conversation.participants.find(participant => participant._id === friendId);
 
-  const senderId = loggedInUserId; // Sender ID is the logged-in user
-  const receiverId = friendId; // Receiver ID is the friend
+  const senderId = loggedInUserId;
+  const receiverId = friendId; 
 
   return (
     <MDBContainer fluid>
@@ -73,19 +85,22 @@ export default function Conversation({ friendId, handleBackToSidebar }) {
         <MDBCol md="10" lg="8" xl="6">
           <MDBCard className="w-auto p-3" id="chat2" style={{ width: "80vw", height: "75vh" }}>
             <MDBCardHeader className="d-flex justify-content-between align-items-center p-3">
-              <h5 className="mb-0 text-white">You've landed with {friend.username}!</h5>
+              <h5 className="mb-0 text-white">You`ve landed with {friend.username}!</h5>
               <MDBBtn className='bg-transparent border-0' onClick={handleBackToSidebar}>
                 <MDBIcon fas icon="undo-alt" size='2x'/>
               </MDBBtn>
             </MDBCardHeader>
             <div className="custom-scrollbar" style={{ maxHeight: "400px", overflow: "auto" }}>
-              <MDBCardBody>
+              <MDBCardBody className="d-flex flex-column">
                 {messages.map(message => {
                   const isSender = message.senderId === loggedInUserId;
                   return (
                     <div key={message._id} className={`message-container ${isSender ? 'sender' : 'receiver'}`}>
+                      <p className='message-sender fw-bolder'>
+                        {message.senderId === loggedInUserId ? 'You' : friend.username}
+                      </p>
                       <p className='message-content'>
-                        {message.senderId === loggedInUserId ? 'You' : friend.username}: {message.messageContent}
+                        {message.messageContent}
                       </p>
                       <p className="message-timestamp">
                         {new Date(parseInt(message.createdAt)).toLocaleString()}

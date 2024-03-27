@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { SEARCH_USER } from '../../../utils/queries';
-import { MDBInput, MDBBtn, MDBCardHeader } from 'mdb-react-ui-kit';
+import { MDBInput, MDBCardHeader } from 'mdb-react-ui-kit';
+import Button from 'react-bootstrap/Button';
 
 export default function SearchBar({ setSearchResult }) {
   const [formState, setFormState] = useState({ searchInput: '' });
@@ -52,9 +53,16 @@ export default function SearchBar({ setSearchResult }) {
           type="text"
           onChange={handleChange}
         />
-        <MDBBtn className="m-auto ms-2" color="primary" size="md" rippleColor="dark" type="submit">
+        <Button className="m-auto ms-2" color="primary" size="md" type="submit" 
+          style={{
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            backdropFilter: "blur(10px)",
+            backgroundImage: "linear-gradient(to right, #ff00cc, #333399)",
+            WebkitBackgroundClip: "text",
+            color: "transparent",
+          }}>
           Search
-        </MDBBtn>
+        </Button>
         {loading && <p>Loading...</p>}
         {error && <p>Error: {error.message}</p>}
         </form>

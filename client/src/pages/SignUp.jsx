@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import Auth from '../utils/auth';
 import { ADD_USER } from '../utils/mutations';
+import Button from 'react-bootstrap/Button'
 import {
-  MDBBtn,
   MDBContainer,
   MDBCard,
   MDBCardBody,
@@ -112,7 +112,19 @@ function SignUp() {
                 value={formState.confirmPassword}
                 onChange={handleChange} />
 
-              <MDBBtn className='w-100 mb-4' size='md'>Sign up</MDBBtn>
+              <Button 
+                type="submit"
+                className='w-100 mb-4' 
+                size='md' 
+                style={{
+                  backgroundColor: "rgba(0, 0, 0, 0.6)",
+                  backdropFilter: "blur(10px)",
+                  backgroundImage: "linear-gradient(to right, #ff00cc, #333399)",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                  }}>
+                Sign up
+              </Button>
             </form>
 
             {error && (

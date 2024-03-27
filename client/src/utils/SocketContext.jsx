@@ -36,7 +36,7 @@ export const SocketContextProvider = ({ children }) => {
         variables: { senderId, receiverId, messageContent }
       });
       console.log("Message sent successfully:", data.sendMessage);
-      // Here, you can emit the message to the receiver using socket.io if needed
+      // Here, we can emit the message to the receiver using socket.io if needed
       if (socket) {
         socket.emit('sendMessage', { senderId, receiverId, messageContent });
       }

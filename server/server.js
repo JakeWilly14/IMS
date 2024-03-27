@@ -10,8 +10,7 @@ const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
 
 require('dotenv').config();
-const PORT = process.env.PORT || 3001;
-console.log(process.env.PORT);
+const PORT = process.env.PORT || 5001;
 
 const apolloServer = new ApolloServer({
   typeDefs,
