@@ -333,6 +333,9 @@ const resolvers = {
     },
     sendMessage: async (_, { senderId, receiverId, messageContent }) => {
       try {
+        console.log("sendMessage mutation called with receiverId:", receiverId);
+        console.log("Message content:", messageContent);
+
         const newMessage = new Message({
           senderId,
           receiverId,
@@ -343,8 +346,9 @@ const resolvers = {
         // Save the message
         const savedMessage = await newMessage.save();
 
-        // Emit the message to the receiver
-        io.to(receiverId).emit('message', { senderId, messageContent });
+        // Emit the message to both sender and receiver's socket rooms
+        io.to(senderId).emit('message', savedMessage);
+        io.to(receiverId).emit('message', savedMessage);
         
         // Find the conversation between the sender and receiver
         let conversation = await Conversation.findOne({

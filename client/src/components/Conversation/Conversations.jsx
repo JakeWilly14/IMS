@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_CONVERSATION_BY_PARTICIPANTS } from '../../utils/queries';
 import { CREATE_CONVERSATION } from '../../utils/mutations';
@@ -14,10 +14,12 @@ import {
   MDBBtn,
   MDBIcon
 } from "mdb-react-ui-kit";
+import { SocketContext } from '../../utils/SocketContext'; // Import the SocketContext
 
 export default function Conversation({ friendId, handleBackToSidebar }) {
   const loggedInUserId = AuthService.getProfile().data._id;
   const [messages, setMessages] = useState([]);
+  const messagesEndRef = useRef(null); // Create a ref for the messages container
 
   const { loading, error, data, refetch } = useQuery(GET_CONVERSATION_BY_PARTICIPANTS, {
     variables: { participant1Id: loggedInUserId, participant2Id: friendId },
@@ -29,6 +31,8 @@ export default function Conversation({ friendId, handleBackToSidebar }) {
     }
   });
 
+  const { socket } = useContext(SocketContext); // Get the socket from the context
+
   useEffect(() => {
     let conversationCreationAttempted = false;
   
@@ -39,7 +43,6 @@ export default function Conversation({ friendId, handleBackToSidebar }) {
         });
   
         if (result && result.data && result.data.createConversation) {
-        
           await refetch(); // Refetch conversation data after creating conversation
         }
       } catch (error) {
@@ -69,6 +72,30 @@ export default function Conversation({ friendId, handleBackToSidebar }) {
       setMessages(data.conversationByParticipants.messages);
     }
   }, [data?.conversationByParticipants]);
+
+  // Listen for incoming messages via socket
+  useEffect(() => {
+    if (socket) {
+      socket.on('message', (message) => {
+        // Update the messages state only if the message is not already in the state
+        if (!messages.find(msg => msg._id === message._id)) {
+          setMessages(prevMessages => [...prevMessages, message]);
+        }
+      });
+
+      // Clean up event listener
+      return () => {
+        socket.off('message');
+      };
+    }
+  }, [socket, friendId, messages]); // Add friendId to the dependency array to ensure the effect runs when friendId changes
+
+  // Scroll to the bottom of the messages container whenever messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   if (loading) return <p>Loading conversation...</p>;
   if (error) return <p>Error fetching conversation: {error.message}</p>;
@@ -108,6 +135,7 @@ export default function Conversation({ friendId, handleBackToSidebar }) {
                     </div>
                   );
                 })}
+                <div ref={messagesEndRef} /> {/* Ref for the bottom of the messages container */}
               </MDBCardBody>
             </div>
             <MessageInput senderId={senderId} receiverId={receiverId}/>

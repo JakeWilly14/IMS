@@ -20,7 +20,7 @@ export const SocketContextProvider = ({ children }) => {
       });
 
       setSocket(socket);
-
+      
       // Log socket connection status
       socket.on('connect', () => {
         console.log("Socket connection established successfully.");
@@ -44,20 +44,6 @@ export const SocketContextProvider = ({ children }) => {
       console.error("Error sending message:", error);
     }
   };
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('message', (message) => {
-        // Handle received message, e.g., update state with the message
-        console.log('Received message:', message);
-      });
-
-      // Clean up event listeners when the component unmounts
-      return () => {
-        socket.off('message');
-      };
-    }
-  }, [socket]);
 
   return (
     <SocketContext.Provider value={{ socket, onlineUsers, sendMessage }}>
