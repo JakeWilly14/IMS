@@ -7,10 +7,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "https://international-messaging-system-ca658f73b538.herokuapp.com"],
     methods: ["GET", "POST"]
   }
 });
+
 
 io.on('connection', (socket) => {
   console.log("A user connected", socket.id);
