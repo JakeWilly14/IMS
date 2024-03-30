@@ -15,20 +15,21 @@ export const SocketContextProvider = ({ children }) => {
   useEffect(() => {
     if (loggedIn) {
       const authUserId = AuthService.getProfile().data._id;
-      const socket = io('http://localhost:3001', {
+      const socket = io(['http://localhost:3001', 'https://international-messaging-system-ca658f73b538.herokuapp.com/'], {
         query: { userId: authUserId }
       });
-
+  
       setSocket(socket);
       
       // Log socket connection status
       socket.on('connect', () => {
         console.log("Socket connection established successfully.");
       });
-
+  
       return () => socket.close();
     }
   }, [loggedIn]);
+  
 
   const sendMessage = async (senderId, receiverId, messageContent) => {
     try {
