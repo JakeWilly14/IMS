@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://international-messaging-system-ca658f73b538.herokuapp.com"],
+    origin: ["http://localhost:3000", "https://international-messaging-system-ca658f73b538.herokuapp.com"],
     methods: ["GET", "POST"]
   }
 });
@@ -17,11 +17,11 @@ io.on('connection', (socket) => {
   console.log("A user connected", socket.id);
 
   // Handle sending messages
-  // socket.on("sendMessage", ({ senderId, receiverId, messageContent }) => {
-  //   console.log("Received message from", senderId, "to", receiverId, ":", messageContent);
-  //   // Here, we can save the message to the database and emit it to the receiver
-  //   // io.to(receiverId).emit("message", { senderId, messageContent });
-  // });
+  socket.on("sendMessage", ({ senderId, receiverId, messageContent }) => {
+    console.log("Received message from", senderId, "to", receiverId, ":", messageContent);
+    // Here, we can save the message to the database and emit it to the receiver
+    io.to(receiverId).emit("message", { senderId, messageContent });
+  });
 
   // Handle disconnection
   socket.on("disconnect", () => {
