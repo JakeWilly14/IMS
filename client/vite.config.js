@@ -9,10 +9,10 @@ export default defineConfig({
     open: true,
     proxy: {
       '/graphql': {
-        target: 'http://localhost:3001',
+        target: 'https://international-messaging-system-ca658f73b538.herokuapp.com',
         secure: false,
         changeOrigin: true,
       }
     }
   }
-})
+});
